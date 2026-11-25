@@ -35,7 +35,7 @@ function cors(res) {
 module.exports = async (req, res) => {
   cors(res);
   if (req.method === 'OPTIONS') return res.status(204).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'POST만 돼요' });
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST만 돼요', build: (process.env.VERCEL_GIT_COMMIT_SHA || 'local').slice(0, 7), env: process.env.VERCEL_ENV || '', key: !!process.env.NEXON_API_KEY });
   const key = process.env.NEXON_API_KEY;
   if (!key) return res.status(500).json({ error: '서버에 넥슨 API 키가 설정되지 않았어요 (Vercel 환경 변수 NEXON_API_KEY)' });
 
