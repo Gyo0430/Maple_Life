@@ -239,10 +239,10 @@ img.face.sm{width:36px;height:36px;border-radius:50%;background:var(--soft)}
 .wdc{display:flex;flex-direction:column;gap:5px;flex:1}.wda{display:flex;flex-direction:column;gap:4px;margin-top:auto}
 .wda .padd{margin-top:6px}.pl{display:none}
 @media(max-width:600px){.pl{display:inline}}
-@media(max-width:600px){.chwrap.one .chars{padding:4px 46px 6px;-webkit-mask-image:none!important;mask-image:none!important;overflow:hidden}
+@media(max-width:600px){.chwrap.one .chars{padding:4px 108px 6px 46px;-webkit-mask-image:none!important;mask-image:none!important;overflow:hidden}
 .chwrap.one .chip:not(.on):not([data-act=addchar]):not(.addf){display:none}.chwrap.one .chars:has(.addf) .chip.on{display:none}.chwrap.one .addf{flex:1;min-width:0}.chwrap.one .addf form{display:flex;gap:6px;width:100%}.chwrap.one .addf input{flex:1;min-width:0}.chwrap.one .chip.on{flex:1;min-width:0;justify-content:center}
-.chwrap.one .chip[data-act=addchar]{padding:6px 12px;font-size:0!important}.chwrap.one .chip[data-act=addchar]::before{content:'＋';font-size:22px}
-.chwrap.one .chip.on .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chwrap.one .chnav.l{left:0}.chwrap.one .chnav.r{right:0}}
+.chwrap.one .chip[data-act=addchar]{position:absolute;right:0;top:4px;bottom:6px;width:56px;min-height:0;padding:0;justify-content:center;font-size:0!important}.chwrap.one .chip[data-act=addchar]::before{content:'＋';font-size:24px;line-height:1}
+.chwrap.one .chip.on .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chwrap.one .chnav.l{left:0}.chwrap.one .chnav.r{right:62px}}
 
 @media(max-width:600px){
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
