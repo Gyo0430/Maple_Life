@@ -239,10 +239,10 @@ img.face.sm{width:36px;height:36px;border-radius:50%;background:var(--soft)}
 .wdc{display:flex;flex-direction:column;gap:5px;flex:1}.wda{display:flex;flex-direction:column;gap:4px;margin-top:auto}
 .wda .padd{margin-top:6px}.pl{display:none}
 @media(max-width:600px){.pl{display:inline}}
-@media(max-width:600px){.chwrap.one .chars{padding:4px 108px 6px 46px;-webkit-mask-image:none!important;mask-image:none!important;overflow:hidden}
+@media(max-width:600px){.chwrap.one .chars{padding:4px 46px 6px;-webkit-mask-image:none!important;mask-image:none!important;overflow:hidden}
 .chwrap.one .chip:not(.on):not([data-act=addchar]):not(.addf){display:none}.chwrap.one .chars:has(.addf) .chip.on{display:none}.chwrap.one .addf{flex:1;min-width:0}.chwrap.one .addf form{display:flex;gap:6px;width:100%}.chwrap.one .addf input{flex:1;min-width:0}.chwrap.one .chip.on{flex:1;min-width:0;justify-content:center}
-.chwrap.one .chip[data-act=addchar]{position:absolute;right:0;top:4px;bottom:6px;width:56px;min-height:0;padding:0;justify-content:center;font-size:0!important}.chwrap.one .chip[data-act=addchar]::before{content:'＋';font-size:24px;line-height:1}
-.chwrap.one .chip.on .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chwrap.one .chnav.l{left:0}.chwrap.one .chnav.r{right:62px}}
+.chwrap.one .chip[data-act=addchar]{display:none;flex:1;justify-content:center;padding:6px 14px}.chwrap.one.addv .chip[data-act=addchar]{display:flex}.chwrap.one.addv .chip.on{display:none}
+.chwrap.one .chip.on .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chwrap.one .chnav.l{left:0}.chwrap.one .chnav.r{right:0}}
 
 @media(max-width:600px){
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
@@ -487,8 +487,9 @@ function change(){recordHist();save();render()}
 
 /* ---------- render ---------- */
 window.addEventListener('resize',()=>chNav());
+const mobIdx=()=>{const n=S.chars.length;if(ui.mobAdd||ui.addChar||!n)return n;const i=S.chars.findIndex(c=>c.id===S.cur);return i<0?0:i};
 const mob1=()=>window.matchMedia&&matchMedia('(max-width:600px)').matches;
-function chNav(){const c=$('#chars'),w=$('#chwrap');if(!c||!w)return;w.classList.toggle('one',mob1());if(mob1()){const k=S.chars.length>1;w.classList.toggle('sl',k);w.classList.toggle('sr',k);return}const m=c.scrollWidth-c.clientWidth;w.classList.toggle('sl',m>2&&c.scrollLeft>2);w.classList.toggle('sr',m>2&&c.scrollLeft<m-2)}
+function chNav(){const c=$('#chars'),w=$('#chwrap');if(!c||!w)return;w.classList.toggle('one',mob1());if(mob1()){const n=S.chars.length,i=mobIdx();w.classList.toggle('addv',i===n);w.classList.toggle('sl',i>0);w.classList.toggle('sr',i<n);return}w.classList.remove('addv');const m=c.scrollWidth-c.clientWidth;w.classList.toggle('sl',m>2&&c.scrollLeft>2);w.classList.toggle('sr',m>2&&c.scrollLeft<m-2)}
 function head(){const t=today();$('#date').textContent=`${+t.slice(5,7)}월 ${+t.slice(8)}일 (${WD[dow(t)]})`;
   $('#resets').innerHTML=[['일간',msTo('d')],['주간 (목)',msTo('thu')],['월간',msTo('m')]]
     .map(([n,ms])=>`<span class="rs">${n} 리셋 <b>${left(ms)}</b></span>`).join('');
@@ -761,8 +762,8 @@ const task=id=>S.tasks.find(t=>t.id===id),ev=id=>S.events.find(e=>e.id===id);
 document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]');if(!b)return;const a=b.dataset.act,id=b.dataset.id||'';
   if(a==='tk'){const t=task(id);if(!t)return;const k=keyOf(t),ck=S.cur+':'+t.id;S.checks[k]=S.checks[k]||{};if(S.checks[k][ck])delete S.checks[k][ck];else S.checks[k][ck]=1;return change()}
   if(a==='et'){const[eid,tid]=id.split('|'),E=ev(eid),t=E&&E.tasks.find(x=>x.id===tid);if(!t)return;const k=evKey(E,t,S.cur);if(S.evChecks[k])delete S.evChecks[k];else S.evChecks[k]=1;return change()}
-  if(a==='char'){S.cur=id;return change()}
-  if(a==='chs'){if(mob1()&&S.chars.length){const i=S.chars.findIndex(c=>c.id===S.cur),n=S.chars.length;S.cur=S.chars[((i<0?0:i)+(+id)+n)%n].id;ui.confirm=null;return change()}const c=$('#chars');c.scrollBy({left:(+id)*Math.max(200,c.clientWidth*.7)});return}
+  if(a==='char'){S.cur=id;ui.mobAdd=false;return change()}
+  if(a==='chs'){if(mob1()){const n=S.chars.length,i=mobIdx(),j=Math.max(0,Math.min(n,i+(+id)));if(j===n){ui.mobAdd=true;return render()}ui.mobAdd=false;ui.addChar=false;S.cur=S.chars[j].id;return change()}const c=$('#chars');c.scrollBy({left:(+id)*Math.max(200,c.clientWidth*.7)});return}
   if(a==='charcancel'){ui.addChar=false;head();return}
   if(a==='addchar'){ui.addChar=true;head();window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('#charform input')?.focus(),50);return}
   if(a==='day'){ui.sel=id;if(id.slice(0,7)!==ui.month)ui.month=id.slice(0,7);return render()}
@@ -835,7 +836,7 @@ document.addEventListener('submit',async e=>{const f=e.target;e.preventDefault()
       if(r.error)throw r.error;if(up&&!r.data.session)msg.textContent='확인 메일을 보냈어요. 메일의 링크를 누른 뒤 여기서 로그인하세요.';}
     catch(err){const m=String(err.message||err);msg.textContent=/Invalid login/i.test(m)?'이메일이나 비밀번호가 맞지 않아요.':/already registered/i.test(m)?'이미 가입된 이메일이에요. 로그인을 눌러 주세요.':/not confirmed/i.test(m)?'메일 인증이 아직 안 됐어요. 받은 메일의 링크를 눌러 주세요.':/after (\d+) seconds/i.test(m)?`보안 때문에 ${m.match(/after (\d+) seconds/i)[1]}초 뒤에 다시 눌러 주세요.`:/rate limit/i.test(m)?'요청이 너무 많아요. 잠시 뒤에 다시 해 주세요.':'실패: '+m}
     return}
-  if(f.id==='charform'){if(!n)return;const c={id:uid(),name:n};S.chars.push(c);S.cur=c.id;ui.addChar=false;return change()}
+  if(f.id==='charform'){if(!n)return;const c={id:uid(),name:n};S.chars.push(c);S.cur=c.id;ui.addChar=false;ui.mobAdd=false;return change()}
   if(f.dataset.p){if(!n)return;S.tasks.push({id:uid(),name:n,period:f.dataset.p,cat:'',reset:String(fd.get('r')||'thu'),chars:[],all:true});S.sample=false;return change()}
   if(f.dataset.ev!==undefined){const E=ev(f.dataset.ev);if(!E||!n)return;E.tasks.push({id:uid(),name:n,type:fd.get('ty')==='once'?'once':'daily'});return change()}
   if(f.classList.contains('ef')){let s=String(fd.get('start')),en=String(fd.get('end'));const re=/^\d{4}-\d{2}-\d{2}$/;if(!re.test(s)||!re.test(en))return;if(en<s)[s,en]=[en,s];
