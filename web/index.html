@@ -735,7 +735,7 @@ function vSetup(){const many=S.chars.length>1;
     ${many?'<p class="note">캐릭터 버튼으로 숙제마다 어떤 캐릭터가 할지 정할 수 있어요. 파란색이 켜진 캐릭터에게만 보이고, 모두 꺼도 숙제는 목록에 남아요.</p>':''}</div>
   <aside>${apiPanel()}
   <section class="panel"><h3>캐릭터</h3>${S.chars.map(c=>{const ck='dc:'+c.id;return`<div class="trow"><input class="tn" data-ch="name" data-id="${c.id}" value="${esc(c.name)}" maxlength="20" aria-label="캐릭터 이름">
-    ${many?`<button class="btn ${ui.confirm===ck?'warn':'ghost'}" data-act="delchar" data-id="${c.id}">${ui.confirm===ck?'정말?':'삭제'}</button>`:''}</div>`}).join('')}
+    <button class="btn ${ui.confirm===ck?'warn':'ghost'}" data-act="delchar" data-id="${c.id}">${ui.confirm===ck?'정말?':'삭제'}</button></div>`}).join('')||'<p class="empty">아직 캐릭터가 없어요.</p>'}
     <button class="btn ghost" data-act="addchar" style="margin-top:12px">＋ 캐릭터 추가</button></section>${notiPanel()}
   <section class="panel" style="margin-top:20px"><h3>백업</h3><p class="rl">다른 곳에 보관하고 싶을 때 복사해 두세요.</p>
     <div class="row" style="margin:10px 0"><button class="btn ghost" data-act="copy">백업 복사</button><span id="copied" class="rl"></span></div>
@@ -798,7 +798,7 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]
   if(a==='sync')return runSync();
   if(a==='logout'){if(sb)await sb.auth.signOut();lsSet('meharil',null);lsSet('meharil-img',null);S=seed();imgs={};render();return}
   if(a==='apiimp'){const m=importApi($('#apiin').value);ui.apimsg=m;if(m.endsWith('불러왔어요'))return change();$('#apimsg').textContent=m;return}
-  if(a==='delchar'){if(confirmStep('dc:'+id)){S.chars=S.chars.filter(c=>c.id!==id);delete S.grow[id];delete S.bsel[id];if(imgs[id]){delete imgs[id];imgsDirty=true;saveImgs([])}for(const t of S.tasks)t.chars=t.chars.filter(x=>x!==id);if(S.cur===id)S.cur=S.chars[0].id;change()}return}
+  if(a==='delchar'){if(confirmStep('dc:'+id)){S.chars=S.chars.filter(c=>c.id!==id);delete S.grow[id];delete S.bsel[id];if(imgs[id]){delete imgs[id];imgsDirty=true;saveImgs([])}for(const t of S.tasks)t.chars=t.chars.filter(x=>x!==id);if(S.cur===id)S.cur=S.chars[0]?S.chars[0].id:null;if(S.bparty)delete S.bparty[id];change()}return}
   if(a==='copy'){try{await navigator.clipboard.writeText(JSON.stringify({kind:'meharil-backup',s:S,imgs}));$('#copied').textContent='복사했어요'}catch(_){$('#imp').value=JSON.stringify(S);$('#imp').closest('details').open=true;$('#copied').textContent='아래 칸의 내용을 직접 복사해 주세요'}return}
   if(a==='imp'){try{let v=JSON.parse($('#imp').value);if(v&&v.kind==='meharil-backup'){if(v.imgs&&typeof v.imgs==='object'){for(const k in v.imgs)if(okImg(v.imgs[k]))imgs[k]=v.imgs[k];imgsDirty=true;lsSet('meharil-img',JSON.stringify(imgs))}v=v.s}if(!v||!Array.isArray(v.chars)||!v.chars.length)throw 0;S=norm(v);prune();backfillBoss();$('#imperr').textContent='불러왔어요';change()}catch(_){$('#imperr').textContent='백업 형식이 아니에요'}return}
   if(a==='reset'){if(confirmStep('reset')){S=seed();change()}return}
