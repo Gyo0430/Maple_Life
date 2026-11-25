@@ -82,7 +82,7 @@ button{font:inherit}
 .sh{display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap}
 .sh p{margin:0;color:var(--mute);font-size:14px}
 .evs{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:18px}
-.evh{display:flex;align-items:center;gap:10px}
+.evh{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap}.evh h3{flex:1 1 auto;min-width:0}.evh .dday{flex:none}
 .dot{width:14px;height:14px;border-radius:50%;background:var(--c);flex:none}
 .dday{margin-left:auto;font-size:15px;padding:3px 10px;border-radius:99px;white-space:nowrap;background:var(--sky);color:#fff}
 .dday.soon{background:var(--pink)}.dday.up,.dday.end{background:var(--soft);color:var(--mute)}
@@ -210,7 +210,7 @@ img.face.sm{width:36px;height:36px;border-radius:50%;background:var(--soft)}
 .evf{background:var(--card);border:2px solid var(--line);border-radius:18px;margin-bottom:12px;overflow:hidden}
 .evf>summary{display:flex;align-items:center;gap:10px;min-height:60px;padding:0 18px;font-weight:400;flex-wrap:wrap}
 .evf>summary::before{content:'▸';color:var(--mute);font-size:13px;transition:transform .15s}.evf[open]>summary::before{content:'▸';transform:rotate(90deg)}
-.evf>summary .dot{width:14px;height:14px}.fn{font-family:Jua,'Noto Sans KR',sans-serif;font-size:20px}.fm{margin-left:auto;font-size:13px;color:var(--mute);white-space:nowrap}
+.evf>summary .dot{width:14px;height:14px}.evf>summary .fm{white-space:nowrap;max-width:100%;overflow:hidden;text-overflow:ellipsis}.fn{font-family:Jua,'Noto Sans KR',sans-serif;font-size:20px}.fm{margin-left:auto;font-size:13px;color:var(--mute);white-space:nowrap}
 .evf[open]>summary{border-bottom:1px solid var(--line);background:var(--soft)}.evfb{padding:16px 18px}
 .fsel{min-height:44px;font-size:15px;padding:0 8px;max-width:180px}
 .ftag{font-family:'Noto Sans KR',sans-serif;font-size:12px;font-weight:700;color:var(--mute);background:var(--soft);border-radius:6px;padding:2px 6px;vertical-align:middle}
@@ -239,6 +239,11 @@ img.face.sm{width:36px;height:36px;border-radius:50%;background:var(--soft)}
 .wdc{display:flex;flex-direction:column;gap:5px;flex:1}.wda{display:flex;flex-direction:column;gap:4px;margin-top:auto}
 .wda .padd{margin-top:6px}.pl{display:none}
 @media(max-width:600px){.pl{display:inline}}
+@media(max-width:600px){.chwrap.one .chars{padding:4px 46px 6px;-webkit-mask-image:none!important;mask-image:none!important;overflow:hidden}
+.chwrap.one .chip:not(.on):not([data-act=addchar]):not(.addf){display:none}.chwrap.one .chars:has(.addf) .chip.on{display:none}.chwrap.one .addf{flex:1;min-width:0}.chwrap.one .addf form{display:flex;gap:6px;width:100%}.chwrap.one .addf input{flex:1;min-width:0}.chwrap.one .chip.on{flex:1;min-width:0;justify-content:center}
+.chwrap.one .chip[data-act=addchar]{padding:6px 12px;font-size:0!important}.chwrap.one .chip[data-act=addchar]::before{content:'＋';font-size:22px}
+.chwrap.one .chip.on .cn{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chwrap.one .chnav.l{left:0}.chwrap.one .chnav.r{right:0}}
+
 @media(max-width:600px){
   body{padding-bottom:calc(72px + env(safe-area-inset-bottom))}
   .band{padding-top:calc(14px + env(safe-area-inset-top))}
@@ -443,8 +448,8 @@ function apiPanel(){return`<section class="panel" style="margin-bottom:20px"><h3
   <p class="rl">위쪽 캐릭터 이름 그대로 넥슨에서 레벨·전투력·심볼·성장 기록과 이벤트 일정을 불러와요. 새 캐릭터는 <b>＋ 캐릭터</b>로 이름을 추가한 뒤 불러오세요.</p>
   <div class="row" style="margin-top:10px"><button class="btn" data-act="sync"${syncing?' disabled':''}>${syncing?'불러오는 중…':'넥슨에서 지금 불러오기'}</button></div>
   <label class="chk"><input type="checkbox" id="autosync"${lsGet('meharil-autosync')==='0'?'':' checked'}> 앱을 열 때 하루 한 번 자동으로 불러오기</label>
-  <p class="rl" id="apimsg" aria-live="polite">${esc(ui.apimsg||'')}</p></section>
-  <section class="panel" style="margin-bottom:20px"><h3>계정</h3><p class="rl">${session?esc(session.user.email||'')+' 로 로그인됨':'로그인 안 됨'}</p>
+  <p class="rl" id="apimsg" aria-live="polite">${esc(ui.apimsg||'')}</p></section>`}
+function acctPanel(){return`<section class="panel" style="margin-top:20px"><h3>계정</h3><p class="rl">${session?esc(session.user.email||'')+' 로 로그인됨':'로그인 안 됨'}</p>
   <button class="btn ghost" data-act="logout" style="margin-top:8px">로그아웃</button></section>`}
 function notiPanel(){return''}
 /* ---------- save / sync (Supabase) ---------- */
@@ -481,12 +486,14 @@ async function initApp(){try{const SB=window.Capacitor&&window.Capacitor.Plugins
 function change(){recordHist();save();render()}
 
 /* ---------- render ---------- */
-function chNav(){const c=$('#chars'),w=$('#chwrap');if(!c||!w)return;const m=c.scrollWidth-c.clientWidth;w.classList.toggle('sl',m>2&&c.scrollLeft>2);w.classList.toggle('sr',m>2&&c.scrollLeft<m-2)}
+window.addEventListener('resize',()=>chNav());
+const mob1=()=>window.matchMedia&&matchMedia('(max-width:600px)').matches;
+function chNav(){const c=$('#chars'),w=$('#chwrap');if(!c||!w)return;w.classList.toggle('one',mob1());if(mob1()){const k=S.chars.length>1;w.classList.toggle('sl',k);w.classList.toggle('sr',k);return}const m=c.scrollWidth-c.clientWidth;w.classList.toggle('sl',m>2&&c.scrollLeft>2);w.classList.toggle('sr',m>2&&c.scrollLeft<m-2)}
 function head(){const t=today();$('#date').textContent=`${+t.slice(5,7)}월 ${+t.slice(8)}일 (${WD[dow(t)]})`;
   $('#resets').innerHTML=[['일간',msTo('d')],['주간 (목)',msTo('thu')],['월간',msTo('m')]]
     .map(([n,ms])=>`<span class="rs">${n} 리셋 <b>${left(ms)}</b></span>`).join('');
   $('#chars').innerHTML=S.chars.map(c=>`<button class="chip${c.id===S.cur?' on':''}" data-act="char" data-id="${c.id}">${okImg(imgs[c.id])?`<img class="face" src="${faceSrc(c.id)}" alt="">`:''}<span class="cn">${esc(c.name)}${c.info?`<small>Lv.${c.info.level}</small>`:''}</span>${c.id===S.cur?`<span class="chx${ui.confirm==='dc:'+c.id?' on':''}" role="button" data-act="delchar" data-id="${c.id}" aria-label="${esc(c.name)} 삭제">${ui.confirm==='dc:'+c.id?'삭제할까요?':'✕'}</span>`:''}</button>`).join('')+
-    (ui.addChar?`<div class="chip"><form id="charform"><input name="n" placeholder="캐릭터 이름" maxlength="20" required autofocus><button class="btn">추가</button><button type="button" class="btn ghost" data-act="charcancel">취소</button></form></div>`
+    (ui.addChar?`<div class="chip addf"><form id="charform"><input name="n" placeholder="캐릭터 이름" maxlength="20" required autofocus><button class="btn">추가</button><button type="button" class="btn ghost" data-act="charcancel">취소</button></form></div>`
     :`<button class="chip" data-act="addchar">＋ 캐릭터</button>`);
   chNav();
   for(const a of document.querySelectorAll('#tabs a'))a.classList.toggle('on',a.dataset.t===ui.tab);
@@ -731,10 +738,10 @@ function vSetup(){const many=S.chars.length>1;
     <input class="tc" data-tf="cat" data-id="${t.id}" value="${esc(t.cat)}" maxlength="10" placeholder="분류" aria-label="분류"><button class="x" data-act="up" data-id="${t.id}" aria-label="위로">↑</button></div>
     <div class="r2"><span class="chs">${many?S.chars.map(c=>`<button class="mini${applies(t,c.id)?' on':''}" data-act="tchar" data-id="${t.id}|${c.id}">${esc(c.name)}</button>`).join(''):''}${many&&!S.chars.some(c=>applies(t,c.id))?'<span class="rl" style="margin:0">담당 캐릭터 없음</span>':''}</span>
     <button class="btn ${ui.confirm===ck?'warn':'ghost'} del" data-act="deltask" data-id="${t.id}">${ui.confirm===ck?'정말?':'삭제'}</button></div></div>`};
-  return`<div class="split"><div>${['d','w','m'].map(p=>`<section class="panel" style="margin-bottom:20px"><h2 style="margin-bottom:6px">${P[p]} 숙제</h2>
-    ${S.tasks.filter(t=>t.period===p).map(trow).join('')||'<p class="empty">숙제가 없어요.</p>'}<div style="margin-top:12px">${qa(p)}</div></section>`).join('')}
+  return`${apiPanel()}<div class="split"><div><section class="panel" style="margin-bottom:20px"><h3 style="margin-bottom:2px">숙제 목록</h3>${['d','w','m'].map(p=>{const ts=S.tasks.filter(t=>t.period===p);return`<details class="dd" data-dd="set-${p}"${(ui.dd||{})['set-'+p]?' open':''}><summary><span class="ddt">${P[p]} 숙제</span><span class="dds">${ts.length}개</span></summary>
+    ${ts.map(trow).join('')||'<p class="empty">숙제가 없어요.</p>'}<div style="margin-top:12px">${qa(p)}</div></details>`}).join('')}</section>
     ${many?'<p class="note">캐릭터 버튼으로 숙제마다 어떤 캐릭터가 할지 정할 수 있어요. 파란색이 켜진 캐릭터에게만 보이고, 모두 꺼도 숙제는 목록에 남아요.</p>':''}</div>
-  <aside>${apiPanel()}
+  <aside>
   <section class="panel"><h3>캐릭터</h3>${S.chars.map(c=>{const ck='dc:'+c.id;return`<div class="trow"><input class="tn" data-ch="name" data-id="${c.id}" value="${esc(c.name)}" maxlength="20" aria-label="캐릭터 이름">
     <button class="btn ${ui.confirm===ck?'warn':'ghost'}" data-act="delchar" data-id="${c.id}">${ui.confirm===ck?'정말?':'삭제'}</button></div>`}).join('')||'<p class="empty">아직 캐릭터가 없어요.</p>'}
     <button class="btn ghost" data-act="addchar" style="margin-top:12px">＋ 캐릭터 추가</button></section>${notiPanel()}
@@ -742,7 +749,7 @@ function vSetup(){const many=S.chars.length>1;
     <div class="row" style="margin:10px 0"><button class="btn ghost" data-act="copy">백업 복사</button><span id="copied" class="rl"></span></div>
     <label class="btn ghost" style="display:inline-flex;align-items:center;margin-bottom:8px;cursor:pointer">백업 파일에서 불러오기<input type="file" id="impfile" accept=".json,.txt,application/json" hidden></label>
     <details><summary>백업 붙여넣어 불러오기</summary><textarea id="imp" placeholder="복사해 둔 백업을 붙여넣기"></textarea><div class="row" style="margin-top:8px"><button class="btn" data-act="imp">불러오기</button><span id="imperr" class="rl"></span></div></details>
-    <button class="btn ${ui.confirm==='reset'?'warn':'ghost'}" data-act="reset" style="margin-top:12px">${ui.confirm==='reset'?'모두 지워져요. 정말 초기화?':'처음 상태로 초기화'}</button></section></aside></div>`}
+    <button class="btn ${ui.confirm==='reset'?'warn':'ghost'}" data-act="reset" style="margin-top:12px">${ui.confirm==='reset'?'모두 지워져요. 정말 초기화?':'처음 상태로 초기화'}</button></section>${acctPanel()}</aside></div>`}
 
 function render(){head();$('#modal').innerHTML=dayModal();$('#main').innerHTML=ui.tab==='boss'?vBoss():ui.tab==='calendar'?vCal():ui.tab==='ledger'?vLedger():ui.tab==='events'?vEvents():ui.tab==='setup'?vSetup():vToday();
   ro.disconnect();const f=$('#growfig');if(f){ro.observe(f);drawGrow()}}
@@ -755,7 +762,7 @@ document.addEventListener('click',async e=>{const b=e.target.closest('[data-act]
   if(a==='tk'){const t=task(id);if(!t)return;const k=keyOf(t),ck=S.cur+':'+t.id;S.checks[k]=S.checks[k]||{};if(S.checks[k][ck])delete S.checks[k][ck];else S.checks[k][ck]=1;return change()}
   if(a==='et'){const[eid,tid]=id.split('|'),E=ev(eid),t=E&&E.tasks.find(x=>x.id===tid);if(!t)return;const k=evKey(E,t,S.cur);if(S.evChecks[k])delete S.evChecks[k];else S.evChecks[k]=1;return change()}
   if(a==='char'){S.cur=id;return change()}
-  if(a==='chs'){const c=$('#chars');c.scrollBy({left:(+id)*Math.max(200,c.clientWidth*.7)});return}
+  if(a==='chs'){if(mob1()&&S.chars.length){const i=S.chars.findIndex(c=>c.id===S.cur),n=S.chars.length;S.cur=S.chars[((i<0?0:i)+(+id)+n)%n].id;ui.confirm=null;return change()}const c=$('#chars');c.scrollBy({left:(+id)*Math.max(200,c.clientWidth*.7)});return}
   if(a==='charcancel'){ui.addChar=false;head();return}
   if(a==='addchar'){ui.addChar=true;head();window.scrollTo({top:0,behavior:'smooth'});setTimeout(()=>$('#charform input')?.focus(),50);return}
   if(a==='day'){ui.sel=id;if(id.slice(0,7)!==ui.month)ui.month=id.slice(0,7);return render()}
