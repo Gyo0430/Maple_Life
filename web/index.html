@@ -38,6 +38,7 @@ h1{font-size:46px;line-height:1.05}
 .chnav{position:absolute;top:50%;transform:translateY(-50%);z-index:2;width:40px;height:40px;border-radius:50%;border:0;background:var(--card);color:var(--ink);font-size:24px;line-height:1;cursor:pointer;box-shadow:0 3px 10px rgb(0 0 0/.18);display:none;align-items:center;justify-content:center;padding-bottom:3px}
 .chnav.l{left:-6px}.chnav.r{right:-6px}.chwrap.sl .chnav.l,.chwrap.sr .chnav.r{display:flex}.chnav:hover{background:var(--soft)}
 .chip form input{width:150px}
+.chx{margin-left:2px;min-width:28px;height:28px;border-radius:14px;display:grid;place-items:center;font-size:13px;font-weight:700;opacity:.55;background:rgba(127,127,127,.18)}.chx.on{padding:0 10px;opacity:1;background:#e5484d;color:#fff}
 .chip{min-height:68px;border:0;border-radius:18px;padding:8px 20px 8px 12px;font-size:18px!important;background:var(--chip);color:inherit;font:inherit;font-weight:500;display:flex;align-items:center;gap:8px;cursor:pointer;flex:none}
 .chip small{font-size:13px;font-weight:500;opacity:.8;white-space:nowrap}
 .chip .cn{white-space:nowrap;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;font-weight:700}
@@ -484,7 +485,7 @@ function chNav(){const c=$('#chars'),w=$('#chwrap');if(!c||!w)return;const m=c.s
 function head(){const t=today();$('#date').textContent=`${+t.slice(5,7)}월 ${+t.slice(8)}일 (${WD[dow(t)]})`;
   $('#resets').innerHTML=[['일간',msTo('d')],['주간 (목)',msTo('thu')],['월간',msTo('m')]]
     .map(([n,ms])=>`<span class="rs">${n} 리셋 <b>${left(ms)}</b></span>`).join('');
-  $('#chars').innerHTML=S.chars.map(c=>`<button class="chip${c.id===S.cur?' on':''}" data-act="char" data-id="${c.id}">${okImg(imgs[c.id])?`<img class="face" src="${faceSrc(c.id)}" alt="">`:''}<span class="cn">${esc(c.name)}${c.info?`<small>Lv.${c.info.level}</small>`:''}</span></button>`).join('')+
+  $('#chars').innerHTML=S.chars.map(c=>`<button class="chip${c.id===S.cur?' on':''}" data-act="char" data-id="${c.id}">${okImg(imgs[c.id])?`<img class="face" src="${faceSrc(c.id)}" alt="">`:''}<span class="cn">${esc(c.name)}${c.info?`<small>Lv.${c.info.level}</small>`:''}</span>${c.id===S.cur?`<span class="chx${ui.confirm==='dc:'+c.id?' on':''}" role="button" data-act="delchar" data-id="${c.id}" aria-label="${esc(c.name)} 삭제">${ui.confirm==='dc:'+c.id?'삭제할까요?':'✕'}</span>`:''}</button>`).join('')+
     (ui.addChar?`<div class="chip"><form id="charform"><input name="n" placeholder="캐릭터 이름" maxlength="20" required autofocus><button class="btn">추가</button><button type="button" class="btn ghost" data-act="charcancel">취소</button></form></div>`
     :`<button class="chip" data-act="addchar">＋ 캐릭터</button>`);
   chNav();
