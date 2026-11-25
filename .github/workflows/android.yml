@@ -28,7 +28,7 @@ jobs:
 
       - name: 앱이 부를 서버(Vercel) 주소 넣기
         env:
-          API_BASE: ${{ vars.MEHARIL_API_BASE }}
+          API_BASE: ${{ vars.MEHARIL_API_BASE || 'https://maplelife-ten.vercel.app' }}
         run: |
           if [ -n "$API_BASE" ]; then sed -i "s|API_BASE: ''|API_BASE: '$API_BASE'|" web/config.js; fi
           grep API_BASE web/config.js
