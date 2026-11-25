@@ -306,14 +306,15 @@ function msTo(kind){const n=kst(),s=ymd(n);let t;
   return new Date(t+'T00:00:00Z')-n}
 function left(ms){const m=Math.max(0,Math.floor(ms/6e4)),d=Math.floor(m/1440),h=Math.floor(m%1440/60);return d?`${d}일 ${h}시간`:`${h}시간 ${m%60}분`}
 
-function seed(){const c=uid(),t=today();return{v:1,sample:true,cur:c,chars:[{id:c,name:'본캐'}],
+function seed(){const t=today();return{v:1,sample:true,cur:null,chars:[],
   tasks:[['아케인리버 일일 퀘스트','d','퀘스트'],['그란디스 일일 퀘스트','d','퀘스트'],['몬스터파크','d','사냥'],['일간 보스','d','보스'],['데일리 기프트 수령','d','기타'],
     ['무릉도장','w','컨텐츠','thu'],['에픽 던전','w','컨텐츠','thu'],['길드 주간 미션','w','길드','thu'],['검은 마법사','m','보스']]
     .map(([name,period,cat,reset])=>({id:uid(),name,period,cat,reset:reset||'thu',chars:[],all:true})),
   checks:{},evChecks:{},hist:{},grow:{},bsel:{},customBoss:[],bossV:1,
   events:[{id:uid(),name:'겨울 이벤트 (예시)',start:addDays(t,-5),end:addDays(t,36),color:COLORS[1],memo:'예시 이벤트예요. 수정하거나 지워도 돼요.',
     tasks:[{id:uid(),name:'이벤트 일일 미션',type:'daily'},{id:uid(),name:'코인샵 교환',type:'once'},{id:uid(),name:'패스 보상 수령',type:'once'}]}]}}
-function norm(s){if(!s||!Array.isArray(s.chars)||!s.chars.length)return seed();
+function norm(s){if(!s||!Array.isArray(s.chars))return seed();
+  if(s.sample){s.chars=s.chars.filter(c=>!(c.name==='본캐'&&!c.info));if(!s.chars.some(c=>c.id===s.cur))s.cur=s.chars[0]?s.chars[0].id:null}
   for(const k of['tasks','events'])if(!Array.isArray(s[k]))s[k]=[];
   for(const k of['checks','evChecks','hist','grow'])if(!s[k]||typeof s[k]!=='object')s[k]={};
   for(const t of s.tasks){if(!Array.isArray(t.chars))t.chars=[];if(t.all===undefined)t.all=!t.chars.length}
