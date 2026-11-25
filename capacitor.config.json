@@ -1,0 +1,8 @@
+{
+  "appId": "com.meharil.app",
+  "appName": "메할일",
+  "webDir": "web",
+  "server": { "androidScheme": "https" },
+  "android": { "backgroundColor": "#ff8a1e" },
+  "plugins": { "StatusBar": { "backgroundColor": "#ff8a1e", "style": "LIGHT", "overlaysWebView": false } }
+}

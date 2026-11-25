@@ -1,0 +1,9 @@
+{
+  "framework": null,
+  "installCommand": "echo skip",
+  "buildCommand": "echo skip",
+  "outputDirectory": "web",
+  "functions": {
+    "api/nexon.js": { "maxDuration": 60 }
+  }
+}

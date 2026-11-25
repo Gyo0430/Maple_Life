@@ -1,0 +1,51 @@
+name: 메할일 APK 빌드
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - run: npm ci
+
+      - name: 앱이 부를 서버(Vercel) 주소 넣기
+        env:
+          API_BASE: ${{ vars.MEHARIL_API_BASE }}
+        run: |
+          if [ -n "$API_BASE" ]; then sed -i "s|API_BASE: ''|API_BASE: '$API_BASE'|" web/config.js; fi
+          grep API_BASE web/config.js
+
+      - run: npx cap sync android
+
+      - name: APK 빌드
+        run: |
+          chmod +x android/gradlew
+          cd android && ./gradlew assembleDebug --no-daemon
+          cp app/build/outputs/apk/debug/app-debug.apk ../meharil.apk
+
+      - name: 릴리스에 올리기
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: 메할일 ${{ github.run_number }}
+          body: 폰에서 meharil.apk 를 눌러 내려받고 설치하세요.
+          files: meharil.apk
+          make_latest: true
